@@ -29,3 +29,9 @@ module "network" {
   ]
   azs = var.azs
 }
+
+module "eks" {
+  source = "./modules/eks"
+
+  private_subnet_ids = module.network.private_subnet_ids
+}
