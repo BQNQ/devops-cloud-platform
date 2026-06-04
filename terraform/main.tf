@@ -35,3 +35,11 @@ module "eks" {
 
   private_subnet_ids = module.network.private_subnet_ids
 }
+
+module "database" {
+  source             = "./modules/database"
+  vpc_id             = module.network.vpc_id
+  private_subnet_ids = module.network.private_subnet_ids
+  db_username        = var.db_username
+  db_password        = var.db_password
+}
