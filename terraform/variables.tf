@@ -1,8 +1,7 @@
-variable "region" {
+variable "environment" {
   type = string
 }
-
-variable "vpc_name" {
+variable "region" {
   type = string
 }
 

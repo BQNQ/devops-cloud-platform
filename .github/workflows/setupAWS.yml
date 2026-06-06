@@ -1,0 +1,56 @@
+name: setup AWS
+on:
+    workflow_dispatch:
+        inputs:
+            env:
+                description: Environment
+                required: True
+                type: choice
+                options:
+                    - dev
+                    - prod
+jobs:
+    terraform:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.env }}
+        defaults:
+            run:
+                working-directory: terraform
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6.1.0
+              with:
+                  audience: sts.amazonaws.com
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-to-assume: ${{ vars.IAM_ROLE_ARN }}
+
+            - name: Setup terraform
+              uses: hashicorp/setup-terraform@v4
+
+            - name: Terraform init
+              run: |
+                  terraform init \
+                  -backend-config="bucket=${{ vars.BACKEND_BUCKET }}" \
+                  -backend-config="region=${{ vars.AWS_REGION }}" \
+                  -backend-config="key=${{ inputs.env }}/terraform.tfstate"
+
+            - name: Setup vars.tfvars
+              run: |
+                  cat << EOF > vars.tfvars
+                  region = "${{ vars.AWS_REGION }}"
+                  azs = "${{ vars.AZS }}"
+                  db_username = "${{ vars.DB_USERNAME }}"
+                  db_password = "${{ secrets.DB_PASSWORD }}"
+                  environment = "${{ inputs.env }}"
+                  EOF
+
+            - name: Terraform plan
+              run: |
+                  terraform plan -var-file=vars.tfvars
+
+            - name: Terraform apply
+              run: |
+                  terraform apply -var-file=vars.tfvars -auto-approve

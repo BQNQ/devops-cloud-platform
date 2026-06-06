@@ -17,3 +17,6 @@ variable "private_subnet_cidr" {
 variable "azs" {
   type = list(string)
 }
+variable "env" {
+  type = string
+}
