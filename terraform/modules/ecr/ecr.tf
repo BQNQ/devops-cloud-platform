@@ -1,9 +1,14 @@
 resource "aws_ecr_repository" "main" {
-  name                 = "flask-app"
+
+  name                 = var.env == "dev" ? "flask-app-dev" : "flask-app"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
+  }
+
+  tags = {
+    Env = var.env
   }
 }
 

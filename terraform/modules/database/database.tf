@@ -1,11 +1,19 @@
 resource "aws_db_subnet_group" "main" {
   name       = "postgres-subnets"
   subnet_ids = var.private_subnet_ids
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_security_group" "postgres" {
   name   = "postgres-sg"
   vpc_id = var.vpc_id
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "postgres" {
@@ -15,10 +23,14 @@ resource "aws_vpc_security_group_ingress_rule" "postgres" {
   from_port   = 5432
   to_port     = 5432
   ip_protocol = "tcp"
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier     = "postgres-db"
+  identifier     = var.env == "dev" ? "postgres-db-dev" : "postgres-db"
   engine         = "postgres"
   engine_version = "18"
 
@@ -34,4 +46,8 @@ resource "aws_db_instance" "postgres" {
   publicly_accessible = false
 
   skip_final_snapshot = true
+
+  tags = {
+    Env = var.env
+  }
 }

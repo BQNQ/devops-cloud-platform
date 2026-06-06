@@ -12,6 +12,10 @@ resource "aws_iam_role" "eks_cluster" {
       },
     ]
   })
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
@@ -33,6 +37,10 @@ resource "aws_iam_role" "eks_node" {
       },
     ]
   })
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "node_worker_policy" {
@@ -51,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "node_ecr_policy" {
 }
 
 resource "aws_eks_cluster" "main" {
-  name     = "my-eks"
+  name     = var.env == "dev" ? "flask-app-eks-dev" : "flask-app-eks"
   role_arn = aws_iam_role.eks_cluster.arn
 
   vpc_config {
@@ -61,6 +69,10 @@ resource "aws_eks_cluster" "main" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy
   ]
+
+  tags = {
+    Env = var.env
+  }
 }
 
 resource "aws_eks_node_group" "workers" {
@@ -82,5 +94,9 @@ resource "aws_eks_node_group" "workers" {
     aws_iam_role_policy_attachment.node_cni_policy,
     aws_iam_role_policy_attachment.node_ecr_policy
   ]
+
+  tags = {
+    Env = var.env
+  }
 }
 
