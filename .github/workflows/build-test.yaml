@@ -21,7 +21,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 jobs:
   build:
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.env || github.event_name == 'push' && 'dev' || github.event_name == 'pull_request' && 'prod' || null}}
@@ -98,11 +98,13 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
   deploy:
-    if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
     needs: test
-    environment: dev
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.env || github.event_name == 'push' && 'dev' || github.event_name == 'pull_request' && 'prod' || null}}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Download image artifact
         uses: actions/download-artifact@v4
         with:
@@ -132,10 +134,12 @@ jobs:
           docker push ${{ vars.ECR_URI}}:${{ github.sha }}
 
       - name: Update deployment.yaml
+        if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
         run: |
           sed -i "s|image: .*|image: ${{ vars.ECR_URI}}:${{ github.sha }}|" k8s/deployment.yaml
 
       - name: Commit changes
+        if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
