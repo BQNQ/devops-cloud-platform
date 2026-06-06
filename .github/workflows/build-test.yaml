@@ -91,7 +91,7 @@ jobs:
       - name: Trivy scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: flask-app:latest
+          image-ref: "${{ vars.ECR_URI}}:${{ github.sha }}"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
