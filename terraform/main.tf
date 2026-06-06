@@ -30,6 +30,10 @@ module "network" {
   azs = var.azs
 }
 
+module "ecr" {
+  source = "./modules/ecr"
+}
+
 module "eks" {
   source = "./modules/eks"
 
