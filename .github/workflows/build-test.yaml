@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-image
-          path: image.tar.gz
+          path: app/image.tar.gz
 
   test:
     needs: build
