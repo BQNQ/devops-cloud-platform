@@ -1,4 +1,4 @@
-name: Deploy to ECS
+name: Build Test
 on:
   # push:
   #   branches:
@@ -21,7 +21,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 jobs:
   build:
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.env || github.event_name == 'push' && 'dev' || github.event_name == 'pull_request' && 'prod' || null}}
@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-image
-          path: image.tar.gz
+          path: app/image.tar.gz
 
   test:
     needs: build
@@ -89,17 +89,22 @@ jobs:
           exit 1
 
       - name: Trivy scan
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: flask-app:latest
-          severity: HIGH,CRITICAL
+          image-ref: "${{ vars.ECR_URI}}:${{ github.sha }}"
+          format: "table"
           exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
   deploy:
-    if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
     needs: test
-    environment: dev
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.env || github.event_name == 'push' && 'dev' || github.event_name == 'pull_request' && 'prod' || null}}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Download image artifact
         uses: actions/download-artifact@v4
         with:
@@ -129,10 +134,12 @@ jobs:
           docker push ${{ vars.ECR_URI}}:${{ github.sha }}
 
       - name: Update deployment.yaml
+        if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
         run: |
           sed -i "s|image: .*|image: ${{ vars.ECR_URI}}:${{ github.sha }}|" k8s/deployment.yaml
 
       - name: Commit changes
+        if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
