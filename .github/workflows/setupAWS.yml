@@ -9,6 +9,9 @@ on:
                 options:
                     - dev
                     - prod
+permissions:
+    id-token: write
+    contents: read
 jobs:
     terraform:
         runs-on: ubuntu-latest
@@ -41,7 +44,7 @@ jobs:
               run: |
                   cat << EOF > vars.tfvars
                   region = "${{ vars.AWS_REGION }}"
-                  azs = "${{ vars.AZS }}"
+                  azs = ${{ vars.AZS }}
                   db_username = "${{ vars.DB_USERNAME }}"
                   db_password = "${{ secrets.DB_PASSWORD }}"
                   environment = "${{ inputs.env }}"
