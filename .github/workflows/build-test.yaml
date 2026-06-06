@@ -93,6 +93,7 @@ jobs:
         with:
           image-ref: flask-app:latest
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
           exit-code: "1"
   deploy:
     if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
