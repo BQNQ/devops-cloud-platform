@@ -3,3 +3,6 @@ loki:
 
 promtail:
   enabled: true
+
+grafana:
+  enabled: false
