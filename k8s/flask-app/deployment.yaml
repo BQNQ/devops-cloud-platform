@@ -18,11 +18,11 @@ spec:
           ports:
             - containerPort: 5000
           env:
-            - name: DB_HOST
+            - name: DB_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   name: db-configmap
-                  key: DB_HOST
+                  key: DB_ENDPOINT
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:

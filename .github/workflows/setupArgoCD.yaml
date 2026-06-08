@@ -96,6 +96,10 @@ jobs:
               run: |
                   kubectl apply -f k8s/bootstrap/initDB.yaml
 
+            - name: Install metrics server
+              run: |
+                kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
             - name: Install ArgoCD
               run: |
                   helm repo add argo https://argoproj.github.io/argo-helm
