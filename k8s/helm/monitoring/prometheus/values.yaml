@@ -1,11 +1,6 @@
 grafana:
   enabled: true
   additionalDataSources:
-    - name: Prometheus
-      type: prometheus
-      url: http://kube-prometheus-stack-prometheus:9090
-      isDefault: false
-
     - name: Loki
       type: loki
       url: http://loki:3100
