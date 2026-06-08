@@ -3,7 +3,7 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = var.private_subnet_ids
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
@@ -12,7 +12,7 @@ resource "aws_security_group" "postgres" {
   vpc_id = var.vpc_id
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
@@ -25,12 +25,12 @@ resource "aws_vpc_security_group_ingress_rule" "postgres" {
   ip_protocol = "tcp"
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier     = var.env == "dev" ? "postgres-db-dev" : "postgres-db"
+  identifier     = terraform.workspace == "dev" ? "postgres-db-dev" : "postgres-db"
   db_name        = "flask-app-db"
   engine         = "postgres"
   engine_version = "18"
@@ -49,6 +49,6 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot = true
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }

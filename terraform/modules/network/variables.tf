@@ -1,7 +1,3 @@
-variable "vpc_name" {
-  type = string
-}
-
 variable "vpc_cidr" {
   type = string
 }
@@ -16,7 +12,4 @@ variable "private_subnet_cidr" {
 
 variable "azs" {
   type = list(string)
-}
-variable "env" {
-  type = string
 }
