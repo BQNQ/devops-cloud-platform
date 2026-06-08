@@ -1,0 +1,19 @@
+server:
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: false
+
+configs:
+  cm:
+    url: http://argocd.local
+
+  params:
+    server.insecure: true
+
+applicationSet:
+  enabled: true
+
+dex:
+  enabled: false

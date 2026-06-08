@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: psql
+          image: postgres:16
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
+            - name: DB_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: db-configmap
+                  key: DB_ENDPOINT
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: db-configmap
+                  key: DB_USER
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-configmap
+                  key: DB_NAME
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+
+              psql \
+                -h $DB_ENDPOINT \
+                -U $DB_USER \
+                -d $DB_NAME <<EOF
+
+              CREATE TABLE IF NOT EXISTS items (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT
+              );
+
+              EOF
