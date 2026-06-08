@@ -5,9 +5,10 @@ on:
   #     - dev
   #   paths:
   #     - app/**
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
+    types: [opened]
+    branches:
+      - main
   #   paths:
   #     - app/**
   workflow_dispatch:
@@ -35,11 +36,11 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t ${{ vars.ECR_URI}}:${{ github.sha }} .
+          docker build -t flask-app:${{ github.sha }} .
 
       - name: Save image to tar
         run: |
-          docker save ${{ vars.ECR_URI}}:${{ github.sha }} -o image.tar
+          docker save flask-app:${{ github.sha }} -o image.tar
 
       - name: Compress
         run: |
@@ -71,7 +72,7 @@ jobs:
 
       - name: Run docker image
         run: |
-          docker run -d --name flask-app -p 5000:5000 ${{ vars.ECR_URI}}:${{ github.sha }}
+          docker run -d --name flask-app -p 5000:5000 flask-app:${{ github.sha }}
 
       - name: Wait for healthcheck
         run: |
@@ -91,7 +92,7 @@ jobs:
       - name: Trivy scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: "${{ vars.ECR_URI}}:${{ github.sha }}"
+          image-ref: "flask-app:${{ github.sha }}"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
@@ -117,6 +118,10 @@ jobs:
       - name: Load docker image
         run: |
           docker load -i image.tar
+
+      - name: Re-tag image
+        run: |
+          docker flask-app:${{ github.sha }} ${{ vars.ECR_URI }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
