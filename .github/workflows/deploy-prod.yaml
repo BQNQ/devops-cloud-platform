@@ -4,8 +4,8 @@ on:
         types: [closed]
         branches:
             - main
-        # paths:
-        #     - app/**
+        paths:
+            - app/**
 
 permissions:
     contents: write
