@@ -1,6 +1,12 @@
-deploymentMode: SimpleScalable
-
 loki:
+  deploymentMode: SimpleScalable
+  singleBinary:
+    ersistence:
+      enabled: false
+
+  ingester:
+    persistence:
+      enabled: false
   loki:
     auth_enabled: false
 
