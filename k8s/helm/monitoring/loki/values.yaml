@@ -13,6 +13,12 @@ loki:
   backend:
     replicas: 0
 
+  chunksCache:
+    enabled: false
+
+  resultsCache:
+    enabled: false
+
   extraEnvFrom:
     - secretRef:
         name: loki-s3
