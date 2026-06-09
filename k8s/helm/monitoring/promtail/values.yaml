@@ -1,49 +1,49 @@
 promtail:
   config:
-  serverPort: 3101
+    serverPort: 3101
 
-  clients:
-    - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+    clients:
+      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
 
-  positions:
-    filename: /run/promtail/positions.yaml
+    positions:
+      filename: /run/promtail/positions.yaml
 
-  scrapeConfigs:
-    - job_name: kubernetes-flask
+    scrapeConfigs:
+      - job_name: kubernetes-flask
 
-      kubernetes_sd_configs:
-        - role: pod
+        kubernetes_sd_configs:
+          - role: pod
 
-      pipeline_stages:
-        - cri: {}
+        pipeline_stages:
+          - cri: {}
 
-        - json:
-            expressions:
-              log: log
+          - json:
+              expressions:
+                log: log
 
-        - json:
-            source: log
+          - json:
+              source: log
 
-        # 4. optional cleanup / indexing
-        - labels:
-            level:
-            message:
-            method:
-            path:
-            status:
-            latency_ms:
-            ip:
-            user_agent:
+          # 4. optional cleanup / indexing
+          - labels:
+              level:
+              message:
+              method:
+              path:
+              status:
+              latency_ms:
+              ip:
+              user_agent:
 
-      relabel_configs:
-        - source_labels: [__meta_kubernetes_namespace]
-          target_label: namespace
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
 
-        - source_labels: [__meta_kubernetes_pod_name]
-          target_label: pod
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
 
-        - source_labels: [__meta_kubernetes_pod_label_app]
-          target_label: app
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: app
 
-        - source_labels: [__meta_kubernetes_pod_container_name]
-          target_label: container
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: container
