@@ -1,8 +1,10 @@
+deploymentMode: SingleBinary
+
 loki:
-  enabled: true
+  auth_enabled: false
 
-promtail:
-  enabled: true
+ingester:
+  replicas: 1
 
-grafana:
-  enabled: false
+storage:
+  type: filesystem

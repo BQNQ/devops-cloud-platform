@@ -1,11 +1,12 @@
 grafana:
   enabled: true
-  sidecar:
-    datasources:
-      enabled: false
 
 prometheus:
-  enabled: true
   prometheusSpec:
-    serviceMonitorSelectorNilUsesHelmValues: false
-    scrapeInterval: 10s
+    retention: 7d
+
+alertmanager:
+  enabled: true
+
+defaultRules:
+  create: true
