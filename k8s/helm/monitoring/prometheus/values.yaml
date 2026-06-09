@@ -1,12 +1,18 @@
-grafana:
-  enabled: true
+kube-prometheus-stack:
+  grafana:
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://monitoring.loki.svc.cluster:3100
+        default: false
 
-prometheus:
-  prometheusSpec:
-    retention: 7d
+  prometheus:
+    prometheusSpec:
+      retention: 7d
 
-alertmanager:
-  enabled: true
+  alertmanager:
+    enabled: true
 
-defaultRules:
-  create: true
+  defaultRules:
+    create: true

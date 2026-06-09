@@ -1,0 +1,8 @@
+apiVersion: v2
+name: monitoring-wrapper
+version: 1.0.0
+
+dependencies:
+  - name: promtail
+    repository: https://grafana.github.io/helm-charts
+    version: 6.0.0

@@ -1,0 +1,45 @@
+promtail:
+  promtail:
+    config:
+      clients:
+        - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+    snippets:
+      pipelineStages:
+        - docker: {}
+
+      scrape_configs:
+        - job_name: kubernetes-pods
+          kubernetes_sd_configs:
+            - role: pod
+
+          pipeline_stages:
+            - docker: {}
+
+          relabel_configs:
+            - action: replace
+              source_labels: [__meta_kubernetes_pod_name]
+              target_label: pod
+
+            - action: replace
+              source_labels: [__meta_kubernetes_namespace]
+              target_label: namespace
+
+            - action: replace
+              source_labels: [__meta_kubernetes_container_name]
+              target_label: container
+
+  daemonset:
+    enabled: true
+  serviceAccount:
+    create: true
+
+  extraVolumes:
+    - name: varlog
+      hostPath:
+        path: /var/log
+
+  extraVolumeMounts:
+    - name: varlog
+      mountPath: /var/log
+      readOnly: true
