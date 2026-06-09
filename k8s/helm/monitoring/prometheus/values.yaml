@@ -5,6 +5,7 @@ grafana:
       enabled: false
 
 prometheus:
+  enabled: true
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     scrapeInterval: 10s
