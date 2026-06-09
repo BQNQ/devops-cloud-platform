@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: flask-app
   labels:
-    release: kube-prometheus-stack
+    release: prometheus
 spec:
   selector:
     matchLabels:
