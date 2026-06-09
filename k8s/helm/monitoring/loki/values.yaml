@@ -3,6 +3,9 @@ loki:
 
   singleBinary:
     replicas: 1
+    extraEnvFrom:
+      - secretRef:
+          name: loki-s3
 
   read:
     replicas: 0
@@ -18,10 +21,6 @@ loki:
 
   resultsCache:
     enabled: false
-
-  extraEnvFrom:
-    - secretRef:
-        name: loki-s3
 
   loki:
     auth_enabled: false
