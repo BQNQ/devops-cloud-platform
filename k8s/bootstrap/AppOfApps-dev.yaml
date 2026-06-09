@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/BQNQ/devops-cloud-platform.git
     targetRevision: dev
-    path: argocd/apps/dev
+    path: k8s/argocd/apps/dev
 
   destination:
     server: https://kubernetes.default.svc
