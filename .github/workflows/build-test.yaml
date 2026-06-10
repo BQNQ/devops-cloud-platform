@@ -1,16 +1,16 @@
 name: Build Test
 on:
-  # push:
-  #   branches:
-  #     - dev
-  #   paths:
-  #     - app/**
+  push:
+    branches:
+      - dev
+    paths:
+      - app/**
   pull_request:
     types: [opened]
     branches:
       - main
-  #   paths:
-  #     - app/**
+    paths:
+      - app/**
   workflow_dispatch:
     inputs:
       env:
