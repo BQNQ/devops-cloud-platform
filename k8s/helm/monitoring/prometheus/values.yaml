@@ -6,10 +6,6 @@ kube-prometheus-stack:
         access: proxy
         url: http://loki.monitoring.svc.cluster.local:3100
         default: false
-    dashboards:
-    default:
-      flask-app-dashboard:
-        file: grafana/dashboard.json
 
   prometheus:
     prometheusSpec:
