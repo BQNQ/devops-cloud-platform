@@ -14,7 +14,7 @@ resource "aws_iam_role" "eks_cluster" {
   })
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_iam_role" "eks_node" {
   })
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "node_ecr_policy" {
 }
 
 resource "aws_eks_cluster" "main" {
-  name     = var.env == "dev" ? "flask-app-eks-dev" : "flask-app-eks"
+  name     = terraform.workspace == "dev" ? "flask-app-eks-dev" : "flask-app-eks"
   role_arn = aws_iam_role.eks_cluster.arn
 
   vpc_config {
@@ -71,7 +71,7 @@ resource "aws_eks_cluster" "main" {
   ]
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 
@@ -96,7 +96,7 @@ resource "aws_eks_node_group" "workers" {
   ]
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 

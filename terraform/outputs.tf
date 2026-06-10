@@ -7,3 +7,6 @@ output "db_name" {
 output "ecr_repo_url" {
   value = module.ecr.ecr_repo_url
 }
+output "eks_cluster_name" {
+  value = module.eks.eks_cluster_name
+}

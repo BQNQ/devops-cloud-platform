@@ -1,0 +1,51 @@
+loki:
+  deploymentMode: SingleBinary
+
+  singleBinary:
+    replicas: 1
+    extraEnvFrom:
+      - secretRef:
+          name: loki-s3
+
+  read:
+    replicas: 0
+
+  write:
+    replicas: 0
+
+  backend:
+    replicas: 0
+
+  chunksCache:
+    enabled: false
+
+  resultsCache:
+    enabled: false
+
+  loki:
+    auth_enabled: false
+
+    commonConfig:
+      replication_factor: 1
+
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+    storage:
+      bucketNames:
+        chunks: loki-36021379213
+        ruler: loki-36021379213
+        admin: loki-36021379213
+
+      s3:
+        region: eu-central-1
+        endpoint: s3.eu-central-1.amazonaws.com
+        s3ForcePathStyle: false
+        insecure: false

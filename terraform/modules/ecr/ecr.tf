@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "main" {
 
-  name                 = var.env == "dev" ? "flask-app-dev" : "flask-app"
+  name                 = "flask-app-${terraform.workspace}"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -8,7 +8,7 @@ resource "aws_ecr_repository" "main" {
   }
 
   tags = {
-    Env = var.env
+    Env = terraform.workspace
   }
 }
 

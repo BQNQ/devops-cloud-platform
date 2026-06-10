@@ -1,0 +1,43 @@
+promtail:
+  config:
+    serverPort: 3101
+
+    clients:
+      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+    positions:
+      filename: /run/promtail/positions.yaml
+    snippets:
+      pipelineStages:
+        - cri: {}
+
+        - json:
+            expressions:
+              log: log
+              stream: stream
+              time: time
+
+        - json:
+            source: log
+            expressions:
+              timestamp: timestamp
+              level: level
+              message: message
+              method: method
+              path: path
+              status: status
+              ip: ip
+              user_agent: user_agent
+
+        - output:
+            source: log
+
+        - labels:
+            timestamp:
+            level:
+            message:
+            method:
+            path:
+            status:
+            ip:
+            user_agent:

@@ -130,13 +130,13 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.IAM_ROLE_ARN }}
 
-      # - name: Login to ECR
-      #   run: |
-      #     aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ vars.ECR_URI }}
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ vars.ECR_URI }}
 
-      # - name: Push to ECR
-      #   run: |
-      #     docker push ${{ vars.ECR_URI}}:${{ github.sha }}
+      - name: Push to ECR
+        run: |
+          docker push ${{ vars.ECR_URI}}:${{ github.sha }}
 
       - name: Update deployment.yaml
         if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'

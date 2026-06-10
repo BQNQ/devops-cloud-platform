@@ -38,7 +38,11 @@ jobs:
                   terraform init \
                   -backend-config="bucket=${{ vars.BACKEND_BUCKET }}" \
                   -backend-config="region=${{ vars.AWS_REGION }}" \
-                  -backend-config="key=${{ inputs.env }}/terraform.tfstate"
+                  -backend-config="key=flask-app/terraform.tfstate"
+
+            - name: Change workspace
+              run: |
+                  terraform workspace select ${{ inputs.env }} || terraform workspace new ${{ inputs.env }}
 
             - name: Setup vars.tfvars
               run: |
@@ -47,7 +51,6 @@ jobs:
                   azs = ${{ vars.AZS }}
                   db_username = "${{ vars.DB_USERNAME }}"
                   db_password = "${{ secrets.DB_PASSWORD }}"
-                  environment = "${{ inputs.env }}"
                   EOF
 
             - name: Terraform plan

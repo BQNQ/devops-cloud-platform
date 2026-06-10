@@ -22,7 +22,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: db-configmap
-                  key: DB_HOST
+                  key: DB_ENDPOINT
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:

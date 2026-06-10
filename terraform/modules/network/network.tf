@@ -5,8 +5,8 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name = "${var.vpc_name}-vpc",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-vpc",
+    Env  = terraform.workspace
   }
 }
 
@@ -19,8 +19,8 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.vpc_name}-subnet-public${count.index}-${var.azs[count.index]}",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-subnet-public${count.index}-${var.azs[count.index]}",
+    Env  = terraform.workspace
   }
 }
 
@@ -32,8 +32,8 @@ resource "aws_subnet" "private" {
   availability_zone = var.azs[count.index]
 
   tags = {
-    Name = "${var.vpc_name}-subnet-private${count.index}-${var.azs[count.index]}",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-subnet-private${count.index}-${var.azs[count.index]}",
+    Env  = terraform.workspace
   }
 }
 
@@ -41,8 +41,8 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.vpc_name}-igw",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-igw",
+    Env  = terraform.workspace
   }
 }
 
@@ -50,8 +50,8 @@ resource "aws_eip" "nat" {
   domain = "vpc"
 
   tags = {
-    Name = "${var.vpc_name}-nat-eip",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-nat-eip",
+    Env  = terraform.workspace
   }
 }
 
@@ -60,8 +60,8 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public[0].id
 
   tags = {
-    Name = "${var.vpc_name}-nat-public1-${var.azs[0]}",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-nat-public1-${var.azs[0]}",
+    Env  = terraform.workspace
   }
 
   depends_on = [aws_internet_gateway.igw]
@@ -76,8 +76,8 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "${var.vpc_name}-rtb-public",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-rtb-public",
+    Env  = terraform.workspace
   }
 }
 
@@ -97,8 +97,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name = "${var.vpc_name}-rtb-private",
-    Env  = var.env
+    Name = "flask-app-${terraform.workspace}-rtb-private",
+    Env  = terraform.workspace
   }
 }
 

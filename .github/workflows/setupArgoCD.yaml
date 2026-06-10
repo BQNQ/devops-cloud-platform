@@ -1,0 +1,123 @@
+name: Setup ArgoCD
+on:
+    workflow_dispatch:
+        inputs:
+            env:
+                type: choice
+                options:
+                    - dev
+                    - prod
+permissions:
+    contents: write
+    id-token: write
+jobs:
+    terraform_data:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.env }}
+        outputs:
+            db_endpoint: ${{ steps.tf.outputs.DB_ENDPOINT}}
+            db_name: ${{ steps.tf.outputs.DB_NAME }}
+            eks_cluster_name: ${{ steps.tf.outputs.EKS_CLUSTER_NAME}}
+        defaults:
+            run:
+                working-directory: terraform
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6.1.0
+              with:
+                  audience: sts.amazonaws.com
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-to-assume: ${{ vars.IAM_ROLE_ARN }}
+
+            - name: Setup terraform
+              uses: hashicorp/setup-terraform@v4
+
+            - name: Terraform init
+              run: |
+                  terraform init \
+                  -backend-config="bucket=${{ vars.BACKEND_BUCKET }}" \
+                  -backend-config="region=${{ vars.AWS_REGION }}" \
+                  -backend-config="key=flask-app/terraform.tfstate"
+
+            - name: Change workspace
+              run: |
+                  terraform workspace select ${{ inputs.env }}
+
+            - name: Output
+              run: |
+                  echo "DB_ENDPOINT=$(terraform output -raw db_endpoint)" >> $GITHUB_OUTPUT
+                  echo "DB_NAME=$(terraform output -raw db_name)" >> $GITHUB_OUTPUT
+                  echo "EKS_CLUSTER_NAME=$(terraform output -raw eks_cluster_name)" >> $GITHUB_OUTPUT
+              id: tf
+
+    bootstrap:
+        needs: terraform_data
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.env }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6.1.0
+              with:
+                  audience: sts.amazonaws.com
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-to-assume: ${{ vars.IAM_ROLE_ARN }}
+
+            - name: Setup kubectl
+              uses: azure/setup-kubectl@v4
+
+            - name: Setup helm
+              uses: azure/setup-helm@v5.0.0
+
+            - name: Update kubeconfig
+              run: |
+                  aws eks update-kubeconfig \
+                  --name ${{ needs.terraform_data.outputs.eks_cluster_name }} \
+                  --region ${{ vars.AWS_REGION }}
+
+            - name: Create db configmap
+              run: |
+                  kubectl create configmap db-configmap \
+                  --from-literal=DB_ENDPOINT=${{ needs.terraform_data.outputs.db_endpoint}} \
+                  --from-literal=DB_USER=${{ vars.DB_USER}} \
+                  --from-literal=DB_NAME=${{ needs.terraform_data.outputs.db_name}}
+
+            - name: Create db secret
+              run: |
+                  kubectl create secret generic db-secret \
+                  --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD}}
+
+            - name: Apply init_db job
+              run: |
+                  kubectl apply -f k8s/bootstrap/initDB.yaml
+
+            - name: Install metrics server
+              run: |
+                kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+            - name: Install ArgoCD
+              run: |
+                  helm repo add argo https://argoproj.github.io/argo-helm
+                  helm repo update
+
+                  helm upgrade --install argocd argo/argo-cd \
+                    -n argocd --create-namespace \
+                    -f k8s/argocd/values.yaml
+
+            - name: Wait for ArgoCD
+              run: |
+                  kubectl wait \
+                    --for=condition=Ready \
+                    pod \
+                    --all \
+                    -n argocd \
+                    --timeout=300s
+
+            - name: Apply app of apps
+              run: |
+                  kubectl apply -f k8s/bootstrap/AppOfApps-${{ inputs.env }}.yaml
