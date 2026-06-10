@@ -7,43 +7,37 @@ promtail:
 
     positions:
       filename: /run/promtail/positions.yaml
+    snippets:
+      pipelineStages:
+        - cri: {}
 
-    scrapeConfigs:
-      - job_name: kubernetes-flask
+        - json:
+            expressions:
+              log: log
+              stream: stream
+              time: time
 
-        kubernetes_sd_configs:
-          - role: pod
+        - json:
+            source: log
+            expressions:
+              timestamp: timestamp
+              level: level
+              message: message
+              method: method
+              path: path
+              status: status
+              ip: ip
+              user_agent: user_agent
 
-        pipeline_stages:
-          - cri: {}
+        - output:
+            source: log
 
-          - json:
-              expressions:
-                log: log
-
-          - json:
-              source: log
-
-          # 4. optional cleanup / indexing
-          - labels:
-              level:
-              message:
-              method:
-              path:
-              status:
-              latency_ms:
-              ip:
-              user_agent:
-
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_namespace]
-            target_label: namespace
-
-          - source_labels: [__meta_kubernetes_pod_name]
-            target_label: pod
-
-          - source_labels: [__meta_kubernetes_pod_label_app]
-            target_label: app
-
-          - source_labels: [__meta_kubernetes_pod_container_name]
-            target_label: container
+        - labels:
+            timestamp:
+            level:
+            message:
+            method:
+            path:
+            status:
+            ip:
+            user_agent:
