@@ -14,3 +14,10 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+variable "admin_user_arn" {
+  type = string
+}
+
+variable "github_role_arn" {
+  type = string
+}

@@ -100,3 +100,31 @@ resource "aws_eks_node_group" "workers" {
   }
 }
 
+data "aws_eks_cluster_auth" "this" {
+  name = aws_eks_cluster.main.name
+}
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapUsers = yamlencode([
+      {
+        userarn  = "arn:aws:iam::<ACCOUNT_ID>:user/admin"
+        username = "admin"
+        groups   = ["system:masters"]
+      }
+    ])
+
+    mapRoles = yamlencode([
+      {
+        rolearn  = "arn:aws:iam::<ACCOUNT_ID>:role/github-actions-role"
+        username = "github-actions"
+        groups   = ["system:masters"]
+      }
+    ])
+  }
+}

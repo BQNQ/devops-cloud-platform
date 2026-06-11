@@ -37,6 +37,9 @@ module "eks" {
   source = "./modules/eks"
 
   private_subnet_ids = module.network.private_subnet_ids
+
+  admin_user_arn  = var.admin_user_arn
+  github_role_arn = var.github_role_arn
 }
 
 module "database" {
