@@ -141,7 +141,7 @@ jobs:
       - name: Update deployment.yaml
         if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
         run: |
-          sed -i "s|image: .*|image: ${{ vars.ECR_URI}}:${{ github.sha }}|" k8s/deployment.yaml
+          sed -i "s|image: .*|image: ${{ vars.ECR_URI}}:${{ github.sha }}|" k8s/flask-app/deployment.yaml
 
       - name: Commit changes
         if: (github.event_name == 'workflow_dispatch' && inputs.env == 'dev') || github.event_name == 'push'
