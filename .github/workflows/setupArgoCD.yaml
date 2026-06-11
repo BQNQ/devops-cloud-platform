@@ -120,8 +120,11 @@ jobs:
 
       - name: Wait for ArgoCD
         run: |
-          kubectl wait --for=condition=Ready pod -n argocd \
-          -l app!=job --timeout=300s
+          kubectl rollout status deployment/argocd-applicationset-controller -n argocd
+          kubectl rollout status deployment/argocd-notifications-controller -n argocd
+          kubectl rollout status deployment/argocd-redis -n argocd
+          kubectl rollout status deployment/argocd-repo-server -n argocd
+          kubectl rollout status deployment/argocd-server -n argocd
 
       - name: Apply app of apps
         run: |
