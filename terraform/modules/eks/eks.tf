@@ -113,7 +113,7 @@ provider "kubernetes" {
   token = data.aws_eks_cluster_auth.this.token
 }
 
-resource "kubernetes_config_map" "aws_auth" {
+resource "kubernetes_config_map_v1_data" "aws_auth" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
