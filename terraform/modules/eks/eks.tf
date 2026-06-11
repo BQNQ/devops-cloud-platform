@@ -101,7 +101,16 @@ resource "aws_eks_node_group" "workers" {
 }
 
 data "aws_eks_cluster_auth" "this" {
-  name = aws_eks_cluster.main.name
+  name       = aws_eks_cluster.main.name
+  depends_on = [aws_eks_cluster.main]
+}
+
+provider "kubernetes" {
+  host = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(
+    aws_eks_cluster.main.certificate_authority[0].data
+  )
+  token = data.aws_eks_cluster_auth.this.token
 }
 
 resource "kubernetes_config_map" "aws_auth" {
@@ -113,7 +122,7 @@ resource "kubernetes_config_map" "aws_auth" {
   data = {
     mapUsers = yamlencode([
       {
-        userarn  = "arn:aws:iam::<ACCOUNT_ID>:user/admin"
+        userarn  = var.admin_user_arn
         username = "admin"
         groups   = ["system:masters"]
       }
@@ -121,10 +130,11 @@ resource "kubernetes_config_map" "aws_auth" {
 
     mapRoles = yamlencode([
       {
-        rolearn  = "arn:aws:iam::<ACCOUNT_ID>:role/github-actions-role"
+        rolearn  = var.github_role_arn
         username = "github-actions"
         groups   = ["system:masters"]
       }
     ])
   }
+  depends_on = [aws_eks_cluster.main]
 }
