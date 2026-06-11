@@ -31,7 +31,7 @@ resource "aws_vpc_security_group_ingress_rule" "postgres" {
 
 resource "aws_db_instance" "postgres" {
   identifier     = terraform.workspace == "dev" ? "postgres-db-dev" : "postgres-db"
-  db_name        = "flask-app-db"
+  db_name        = "flaskAppDB"
   engine         = "postgres"
   engine_version = "18"
 
