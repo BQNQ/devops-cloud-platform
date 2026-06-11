@@ -82,6 +82,7 @@ jobs:
 
       - name: Create loki secret
         run: |
+          kubectl create namespace monitoring
           kubectl create secret generic loki-s3 \
           -n monitoring \
           --from-literal=AWS_ACCESS_KEY_ID=${{ vars.LOKI_KEY_ID }} \
