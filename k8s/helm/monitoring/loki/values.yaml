@@ -7,9 +7,7 @@ loki:
       - secretRef:
           name: loki-s3
     persistence:
-      enabled: true
-      storageClass: gp2
-      size: 5Gi
+      enabled: false
 
   read:
     replicas: 0
