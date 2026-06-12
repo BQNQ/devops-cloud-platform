@@ -87,7 +87,7 @@ resource "aws_eks_node_group" "workers" {
     max_size     = 2
   }
 
-  instance_types = ["t3.small"]
+  instance_types = ["c7i-flex.large"]
 
   depends_on = [
     aws_iam_role_policy_attachment.node_worker_policy,
@@ -100,3 +100,42 @@ resource "aws_eks_node_group" "workers" {
   }
 }
 
+data "aws_eks_cluster_auth" "this" {
+  name       = aws_eks_cluster.main.name
+  depends_on = [aws_eks_cluster.main]
+}
+
+provider "kubernetes" {
+  host = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(
+    aws_eks_cluster.main.certificate_authority[0].data
+  )
+  token = data.aws_eks_cluster_auth.this.token
+}
+
+resource "kubernetes_config_map_v1" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+
+  data = {
+    mapUsers = yamlencode([
+      {
+        userarn  = var.admin_user_arn
+        username = "admin"
+        groups   = ["system:masters"]
+      }
+    ])
+
+    mapRoles = yamlencode([
+      {
+        rolearn  = var.github_role_arn
+        username = "github-actions"
+        groups   = ["system:masters"]
+      }
+    ])
+  }
+  depends_on = [aws_eks_cluster.main]
+}

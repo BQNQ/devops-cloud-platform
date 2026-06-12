@@ -51,6 +51,8 @@ jobs:
                   azs = ${{ vars.AZS }}
                   db_username = "${{ vars.DB_USERNAME }}"
                   db_password = "${{ secrets.DB_PASSWORD }}"
+                  admin_user_arn = "${{ vars.ADMIN_USER_ARN }}"
+                  github_role_arn = "${{ vars.IAM_ROLE_ARN }}"
                   EOF
 
             - name: Terraform plan
