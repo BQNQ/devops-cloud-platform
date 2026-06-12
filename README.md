@@ -73,3 +73,11 @@ devops-cloud-platform/
 └── terraform
     ├── backend         # Bootstrap for s3 backend
     └── modules         # EKS, ECR, VPC and RDS modules
+```
+
+## What I Learned
+
+- How to build a GitOps deployment flow using Argo CD, Helm and Kubernetes manifests.
+- How to split CI/CD into two parts: validation for pull requests and deployment for dev and main branches.
+- How Prometheus, Grafana, and Loki work together for metrics, dashboards, and logs.
+- How to separate a cloud project into parts like infrastructure, applications, deployment, and monitoring.
