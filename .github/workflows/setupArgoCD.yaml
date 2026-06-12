@@ -93,7 +93,7 @@ jobs:
         run: |
           kubectl create configmap db-configmap \
           --from-literal=DB_ENDPOINT=${{ needs.terraform_data.outputs.db_endpoint}} \
-          --from-literal=DB_USER=${{ vars.DB_USER}} \
+          --from-literal=DB_USER=${{ vars.DB_USERNAME}} \
           --from-literal=DB_NAME=${{ needs.terraform_data.outputs.db_name}}
 
       - name: Create db secret
