@@ -6,6 +6,9 @@ loki:
     extraEnvFrom:
       - secretRef:
           name: loki-s3
+    persistence:
+      enabled: true
+      storageClass: gp3
 
   read:
     replicas: 0
