@@ -8,7 +8,8 @@ loki:
           name: loki-s3
     persistence:
       enabled: true
-      storageClass: gp3
+      storageClass: gp2
+      size: 5Gi
 
   read:
     replicas: 0
